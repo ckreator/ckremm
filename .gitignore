@@ -1,1 +1,8 @@
-/ckremm
+*.o
+*.out
+/bin/*
+/tmp/*
+/src/headers/headers
+/src/tables/tables
+!/**/*.c
+!/**/*.h
