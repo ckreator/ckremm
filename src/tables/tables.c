@@ -107,20 +107,20 @@ bool t_pool_dealloc(t_pool *pool, void **p) {
 bool destroy_t_pool(t_pool *pool) {
     if (pool == NULL)
         return true;
-    printf("destroying pool\n");
+    //printf("destroying pool\n");
     if (pool->space)
         free(pool->space);
 
-    printf("freed space\n");
+    //printf("freed space\n");
     table_m *p = pool->table_keeper;
     table_m *o;
     for (; p != NULL;) {
-        printf("destroying table => %p | ptr: %p | size: %lu\n", p, p->ptr, p->size);
+        //printf("destroying table => %p | ptr: %p | size: %lu\n", p, p->ptr, p->size);
         o = p->next;
         free(p);
         p = o;
     }
-    printf("freed table\n");
+    //printf("freed table\n");
     //free(p);
     return false;
 }
