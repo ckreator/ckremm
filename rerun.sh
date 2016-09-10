@@ -14,6 +14,8 @@ then
 	exit 1
 fi
 
+rm -rf bin/* tmp/*
+
 make clean
 
 make $1
