@@ -99,23 +99,103 @@ void *t_pool_alloc(t_pool *pool, size_t size) {
     return search->ptr;
 }
 
-bool t_pool_dealloc(t_pool *pool, void *ptr) {
-    return false;
+bool t_pool_dealloc(t_pool *pool, void **p) {
+    // Steps:
+    // DEBUG:
+    void *ptr = *p;
+    printf("ptr -> %p\n", ptr);
+    //return false;
+    // 1. Sanity-check pool and ptr
+    if (pool == NULL || pool->table_keeper == NULL) {
+        printf("pool is invalid\n");
+        return false;
+    }
+
+    if (ptr == NULL) {
+        printf("ptr is invalid\n");
+        return false;
+    }
+    // 2. Search a chunk where ptr belongs
+    table_m *search = pool->table_keeper;
+    table_m *prev = NULL;
+    for (; search != NULL; prev = search, search = search->next) {
+        if (ptr >= search->ptr && ptr < (search->ptr + search->size)) {
+            break;
+        }
+    }
+
+    //printf("DEALLOC: search: ptr: %p | size: %lu | used: %s\n", search, search->size, search->used ? "true" : "false");
+    //return false;
+    if (search == NULL) {
+        printf("couldn't find ptr in pool\n");
+        return false;
+    }
+
+    /*if (!search->used) {
+        printf("");
+    }*/
+
+    // 3. Check if neighbors are free
+    // To avoid possible 'overbranching', we could use a little 'hack'
+    // we can use the UNIX method to checkout the permission and apply
+    // it here to find whether we need to do:
+    // 0 - Don't merge, just release
+    // 1 - merge to lower neighbor
+    // 2 - merge to upper neighbor
+    // 3 - merge to lower and upper neighbor
+    // this way we'll have only a simple if-else if-else if statement
+    unsigned char mask = 0;
+    mask += ((prev != NULL && !prev->used) ? 1 : 0);
+    mask += ((search->next != NULL && !search->next->used) ? 2 : 0);
+    // now mask is either 0, 1, 2 or 3
+    if (mask == 0) {
+        search->used = false;
+    } else if (mask == 1) {
+        // merge to lower
+        // TODO: it's probably a good idea to call reorder_t_mem at some point
+        prev->next = search->next;
+        prev->size += search->size;
+        prev->used = false; // just to be sure
+        free(search);
+    } else if (mask == 2) {
+        // merge to upper
+        search->used = false;
+        search->size += search->next->size;
+        // utilize 'prev' pointer
+        prev = search->next;
+        search->next = search->next->next;
+        free(prev); // NOTE: don't be confused by this, I just reused prev
+    } else if (mask == 3) {
+        // merge both
+        prev->used = false;
+        prev->next = search->next->next;
+        prev->size += search->size + search->next->size;
+        // free table entries
+        free(search->next);
+        free(search);
+    }
+
+    return true;
 }
 
 bool destroy_t_pool(t_pool *pool) {
     if (pool == NULL)
         return true;
+    printf("destroying pool\n");
     if (pool->space)
         free(pool->space);
+
+    printf("freed space\n");
     table_m *p = pool->table_keeper;
     table_m *o;
-    for (; p->next != NULL;) {
+    for (; p != NULL;) {
+        printf("destroying table => %p | ptr: %p | size: %lu\n", p, p->ptr, p->size);
         o = p->next;
         free(p);
         p = o;
     }
-    free(p);
+    printf("freed table\n");
+    //free(p);
     return false;
 }
 

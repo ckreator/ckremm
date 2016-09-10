@@ -24,7 +24,7 @@ typedef struct t_pool {
 
 t_pool *create_pool(size_t size);
 void *t_pool_alloc(t_pool *pool, size_t size);
-bool t_pool_dealloc(t_pool *pool, void *ptr);
+bool t_pool_dealloc(t_pool *pool, void **ptr);
 bool destroy_t_pool(t_pool *pool);
 bool clean_t_ptr(t_pool *pool, void *ptr);
 bool reorder_t_mem(t_pool *pool);
