@@ -27,7 +27,8 @@ t_pool *create_pool(size_t size) {
     ret->table_keeper->size = size;
 
     // create the 'pool' itself
-    ret->space = malloc(sizeof(size));
+    ret->space = malloc(size);
+    //printf("allocated memory from %p to %p\n", ret->space, ret->space + size);
 
     // Make sure ret->space was allocated
     if (ret->space == NULL) {
