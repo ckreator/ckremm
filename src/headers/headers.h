@@ -12,6 +12,8 @@
  * - id_table(allocate in the beginning)
  * - used (useful to know how much space is still left
  */
+ #ifndef CKREMM_HEADERS_H
+ #define CKREMM_HEADERS_H
 
 #include <stdint.h>
 // TODO: Check if C is C99 or newer
@@ -38,3 +40,4 @@ void *pool_alloc(h_pool *pool, size_t size);
 void pool_dealloc(h_pool *pool, Header *ap);
 bool destroy_pool(h_pool *pool);
 void show_pool(h_pool *pool);
+#endif // headers_h

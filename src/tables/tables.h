@@ -5,6 +5,8 @@
 // Because small devices may not need 32 bits for size
 // and used can be 1 bit only (if you can fill the other
 // 7 bits of padding space)
+#ifndef CKREMM_TABLES_H
+#define CKREMM_TABLES_H
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -54,3 +56,4 @@ bool t_write_to(table_m *dest, void *data, size_t count);
 
 // good for debugging, not really part of API
 void show_t_mem(t_pool *pool);
+#endif
